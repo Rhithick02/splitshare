@@ -1,0 +1,69 @@
+//package com.expensemanagement.splitshare.entity;
+//
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Id;
+//import jakarta.persistence.Table;
+//
+//@Entity
+//@Table(name = "split_information")
+//public class SplitInformationEntity {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+//    private Long splitId;
+//
+//    private Long transactionId;
+//    private Long userId;
+//    private Double splitFraction;
+//    private Double amount;
+//    private String payerPayee; // Enum can be used for better type safety
+//
+//    public Long getSplitId() {
+//        return splitId;
+//    }
+//
+//    public void setSplitId(Long splitId) {
+//        this.splitId = splitId;
+//    }
+//
+//    public Long getTransactionId() {
+//        return transactionId;
+//    }
+//
+//    public void setTransactionId(Long transactionId) {
+//        this.transactionId = transactionId;
+//    }
+//
+//    public Long getUserId() {
+//        return userId;
+//    }
+//
+//    public void setUserId(Long userId) {
+//        this.userId = userId;
+//    }
+//
+//    public Double getSplitFraction() {
+//        return splitFraction;
+//    }
+//
+//    public void setSplitFraction(Double splitFraction) {
+//        this.splitFraction = splitFraction;
+//    }
+//
+//    public Double getAmount() {
+//        return amount;
+//    }
+//
+//    public void setAmount(Double amount) {
+//        this.amount = amount;
+//    }
+//
+//    public String getPayerPayee() {
+//        return payerPayee;
+//    }
+//
+//    public void setPayerPayee(String payerPayee) {
+//        this.payerPayee = payerPayee;
+//    }
+//}

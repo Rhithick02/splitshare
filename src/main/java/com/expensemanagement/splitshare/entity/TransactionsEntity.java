@@ -19,19 +19,11 @@ public class TransactionsEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long transactionId;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private GroupsEntity group;
+    private Long groupId;
     private Double totalAmount;
     private String method;
-
-    @ManyToOne
-    @JoinColumn(name = "created_by")
-    private UsersEntity createdBy;
-
-    @ManyToOne
-    @JoinColumn(name = "updated_by")
-    private UsersEntity updatedBy;
+    private Long createdBy;
+    private Long updatedBy;
     private Timestamp createDate;
     private Timestamp updateDate;
 
@@ -72,27 +64,27 @@ public class TransactionsEntity {
         this.method = method;
     }
 
-    public GroupsEntity getGroup() {
-        return group;
+    public Long getGroupId() {
+        return groupId;
     }
 
-    public void setGroup(GroupsEntity group) {
-        this.group = group;
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 
-    public UsersEntity getCreatedBy() {
+    public Long getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(UsersEntity createdBy) {
+    public void setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
     }
 
-    public UsersEntity getUpdatedBy() {
+    public Long getUpdatedBy() {
         return updatedBy;
     }
 
-    public void setUpdatedBy(UsersEntity updatedBy) {
+    public void setUpdatedBy(Long updatedBy) {
         this.updatedBy = updatedBy;
     }
 

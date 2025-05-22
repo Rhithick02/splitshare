@@ -18,18 +18,9 @@ public class PaymentDetailsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long paymentId;
-
-    @ManyToOne
-    @JoinColumn(name = "payer_user_id")
-    private UsersEntity payer;
-
-    @ManyToOne
-    @JoinColumn(name = "debtor_user_id")
-    private UsersEntity debtor;
-
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private GroupsEntity group;
+    private Long payerId;
+    private Long debtorId;
+    private Long groupId;
     private Double amount;
     private String status;
     private Boolean deleted;
@@ -57,28 +48,28 @@ public class PaymentDetailsEntity {
         this.paymentId = paymentId;
     }
 
-    public UsersEntity getPayer() {
-        return payer;
+    public Long getPayerId() {
+        return payerId;
     }
 
-    public void setPayer(UsersEntity payer) {
-        this.payer = payer;
+    public void setPayerId(Long payerId) {
+        this.payerId = payerId;
     }
 
-    public UsersEntity getDebtor() {
-        return debtor;
+    public Long getDebtorId() {
+        return debtorId;
     }
 
-    public void setDebtor(UsersEntity debtor) {
-        this.debtor = debtor;
+    public void setDebtorId(Long debtorId) {
+        this.debtorId = debtorId;
     }
 
-    public GroupsEntity getGroup() {
-        return group;
+    public Long getGroupId() {
+        return groupId;
     }
 
-    public void setGroup(GroupsEntity group) {
-        this.group = group;
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 
     public Double getAmount() {

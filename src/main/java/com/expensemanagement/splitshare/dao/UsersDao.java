@@ -27,4 +27,32 @@ public class UsersDao {
         log.info("Found UserId = {} with the phoneNumber = {}", user.getUserId(), phoneNumber);
         return user;
     }
+
+    public boolean doesPhoneNumberExist(String phoneNumber) {
+        UsersEntity user = usersRepository.findByPhoneNumber(phoneNumber);
+        if (Objects.isNull(user)) {
+            return false;
+        }
+        return true;
+    }
+
+    public UsersEntity upsertUserData(UsersEntity user) {
+        UsersEntity userDataFromDb = null;
+        if (Objects.nonNull(user.getPhoneNumber())) {
+            userDataFromDb = getUserByPhoneNumber(user.getPhoneNumber());
+        }
+        if (Objects.nonNull(userDataFromDb)) {
+            if (Objects.isNull(user.getEmail())) {
+                user.setEmail(userDataFromDb.getEmail());
+            }
+            if (Objects.isNull(user.getCountryCode())) {
+                user.setCountryCode(userDataFromDb.getCountryCode());
+            }
+            if (Objects.isNull(user.getUserName())) {
+                user.setUserName(userDataFromDb.getUserName());
+            }
+        }
+        UsersEntity savedResponse = usersRepository.save(user);
+        return savedResponse;
+    }
 }

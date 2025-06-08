@@ -2,6 +2,7 @@ package com.expensemanagement.splitshare.controller;
 
 import com.expensemanagement.splitshare.dto.LoginRequest;
 import com.expensemanagement.splitshare.dto.LoginResponse;
+import com.expensemanagement.splitshare.dto.RegisterRequest;
 import com.expensemanagement.splitshare.dto.VerifyTokenRequest;
 import com.expensemanagement.splitshare.service.AuthService;
 import com.expensemanagement.splitshare.util.ValidateUtil;
@@ -46,6 +47,13 @@ public class AuthController {
         validateUtil.validateLoginRequest(loginRequest);
         LoginResponse loginResponse = authService.processLogin(loginRequest);
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponse> register(@RequestBody RegisterRequest registerRequest) {
+        validateUtil.validateRegisterRequest(registerRequest);
+        LoginResponse loginResponse = authService.processRegistration(registerRequest);
+        return new ResponseEntity<>(loginResponse, HttpStatus.CREATED);
     }
 
     @PostMapping("/verify")

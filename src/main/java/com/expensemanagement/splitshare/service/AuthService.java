@@ -1,6 +1,7 @@
 package com.expensemanagement.splitshare.service;
 
 import com.expensemanagement.splitshare.dao.UsersDao;
+import com.expensemanagement.splitshare.dto.RegisterRequest;
 import com.expensemanagement.splitshare.entity.GroupsEntity;
 import com.expensemanagement.splitshare.exception.BadRequestException;
 import com.expensemanagement.splitshare.integration.TwilioSmsIntegration;
@@ -40,8 +41,13 @@ public class AuthService {
         String nationalNumber = loginRequest.getNationalNumber();
         String countryCode = loginRequest.getCountryCode();
         String phoneNumber = countryCode + nationalNumber;
-        // Check if user has registered
-        UsersEntity user = usersDao.getUserByPhoneNumber(phoneNumber);
+        boolean doesPhoneNumberExist = usersDao.doesPhoneNumberExist(phoneNumber);
+        if ((loginRequest.isRegistrationRequest() && doesPhoneNumberExist)) {
+            throw new BadRequestException(String.format("Phonenumber %s already exists", phoneNumber));
+        }
+        if (!loginRequest.isRegistrationRequest() && !doesPhoneNumberExist) {
+            throw new NotFoundException("phoneNumber", phoneNumber);
+        }
         // Generate and send Otp
         String otp = otpService.generateOtp(phoneNumber);
         twilioSmsIntegration.sendSms(phoneNumber, otp);
@@ -72,6 +78,35 @@ public class AuthService {
             groupInformationList.add(groupInformation);
         }
         loginResponse.setGroupInformationList(groupInformationList);
+        return loginResponse;
+    }
+
+    public LoginResponse processRegistration(RegisterRequest registerRequest) {
+        LoginResponse loginResponse = new LoginResponse();
+        String nationalNumber = registerRequest.getNationalNumber();
+        String countryCode = registerRequest.getCountryCode();
+        String phoneNumber = countryCode + nationalNumber;
+        if (usersDao.doesPhoneNumberExist(phoneNumber)) {
+            throw new BadRequestException(String.format("Phonenumber %s already exists", phoneNumber));
+        }
+        if (!otpService.verifyOtp(phoneNumber, registerRequest.getPhoneOtp())) {
+            // throw exception
+        }
+
+        // Build userEntity request and Save to DB
+        UsersEntity user = new UsersEntity();
+        user.setUserName(registerRequest.getUserName());
+        user.setCountryCode(registerRequest.getCountryCode());
+        user.setPhoneNumber(phoneNumber);
+        user.setEmail(registerRequest.getEmailId());
+        UsersEntity savedUser = usersDao.upsertUserData(user);
+
+        // Generate loginResponse
+        String accessToken = jwtUtil.generateJwAccessToken(savedUser.getUserId(), phoneNumber);
+        loginResponse.setAccessToken(accessToken);
+        loginResponse.setUserId(savedUser.getUserId());
+        loginResponse.setPhoneNumber(phoneNumber);
+        loginResponse.setEmailId(savedUser.getEmail());
         return loginResponse;
     }
 

@@ -4,17 +4,14 @@ import com.expensemanagement.splitshare.constants.AuthConstants;
 import com.expensemanagement.splitshare.exception.UnauthorizedException;
 import com.expensemanagement.splitshare.util.HeaderUtil;
 import com.expensemanagement.splitshare.util.JwtUtil;
-import com.expensemanagement.splitshare.util.ValidateUtil;
+import com.expensemanagement.splitshare.validate.Validator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,12 +19,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final ValidateUtil validateUtil;
+    private final Validator authorizationValidator;
     private final HeaderUtil headerUtil;
     private final JwtUtil jwtUtil;
 
-    public JwtFilter(ValidateUtil validateUtil, HeaderUtil headerUtil, JwtUtil jwtUtil) {
-        this.validateUtil = validateUtil;
+    public JwtFilter(@Qualifier("authorizationValidator") Validator authorizationValidator, HeaderUtil headerUtil, JwtUtil jwtUtil) {
+        this.authorizationValidator = authorizationValidator;
         this.headerUtil = headerUtil;
         this.jwtUtil = jwtUtil;
     }
@@ -43,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         try {
             String authorization = request.getHeader("Authorization");
-            validateUtil.validateAuthHeader(authorization);
+            authorizationValidator.validate(authorization);
             Map<String, String> authParams = headerUtil.convertAuthorizationToParams(authorization);
             jwtUtil.decodeJWToken(authParams.get("token"), Long.parseLong(authParams.get("user_id")), authParams.get("phone_number"));
             filterChain.doFilter(request, response);

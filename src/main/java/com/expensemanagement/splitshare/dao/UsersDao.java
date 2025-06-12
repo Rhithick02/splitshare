@@ -38,7 +38,7 @@ public class UsersDao {
 
     public UsersEntity upsertUserData(UsersEntity user) {
         UsersEntity userDataFromDb = null;
-        if (Objects.nonNull(user.getPhoneNumber())) {
+        if (Objects.nonNull(user.getPhoneNumber()) && doesPhoneNumberExist(user.getPhoneNumber())) {
             userDataFromDb = getUserByPhoneNumber(user.getPhoneNumber());
         }
         if (Objects.nonNull(userDataFromDb)) {
@@ -54,5 +54,15 @@ public class UsersDao {
         }
         UsersEntity savedResponse = usersRepository.save(user);
         return savedResponse;
+    }
+
+    public UsersEntity getUserByUserId(Long userId) {
+        UsersEntity user = usersRepository.findByUserId(userId);
+        if (Objects.isNull(user)) {
+            log.error("No valid user is found for the userId - {}", userId);
+            throw new NotFoundException("userId", userId.toString());
+        }
+        log.info("Found UserId = {} with the userId = {}", user.getUserId(), userId);
+        return user;
     }
 }

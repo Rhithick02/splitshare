@@ -1,21 +1,18 @@
 package com.expensemanagement.splitshare.service;
 
 import com.expensemanagement.splitshare.dao.UsersDao;
-import com.expensemanagement.splitshare.dto.RegisterRequest;
-import com.expensemanagement.splitshare.entity.GroupsEntity;
-import com.expensemanagement.splitshare.exception.BadRequestException;
-import com.expensemanagement.splitshare.integration.TwilioSmsIntegration;
-import com.expensemanagement.splitshare.model.GroupInformation;
-import com.expensemanagement.splitshare.repository.UsersRepository;
 import com.expensemanagement.splitshare.dto.LoginRequest;
 import com.expensemanagement.splitshare.dto.LoginResponse;
+import com.expensemanagement.splitshare.dto.RegisterRequest;
+import com.expensemanagement.splitshare.entity.GroupsEntity;
 import com.expensemanagement.splitshare.entity.UsersEntity;
+import com.expensemanagement.splitshare.exception.BadRequestException;
 import com.expensemanagement.splitshare.exception.NotFoundException;
+import com.expensemanagement.splitshare.integration.TwilioSmsIntegration;
+import com.expensemanagement.splitshare.model.GroupInformation;
 import com.expensemanagement.splitshare.util.JwtUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

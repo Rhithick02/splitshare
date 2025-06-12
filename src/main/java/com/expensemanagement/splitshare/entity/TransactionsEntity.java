@@ -19,25 +19,18 @@ public class TransactionsEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long transactionId;
 
+    private Long paymentId;
     private Long groupId;
+    private Long userId;
     private Double totalAmount;
     private String method;
-    private Long createdBy;
-    private Long updatedBy;
+    private String transactionType;
     private Timestamp createDate;
-    private Timestamp updateDate;
 
     @PrePersist
-    public void setCreationAndUpdationDate() {
+    public void setCreationAndDate() {
         Timestamp timestamp = new Timestamp(new Date().getTime());
         this.createDate = timestamp;
-        this.updateDate = timestamp;
-    }
-
-    @PreUpdate
-    public void setUpdationDate() {
-        Timestamp timestamp = new Timestamp(new Date().getTime());
-        this.updateDate = timestamp;
     }
 
     public Long getTransactionId() {
@@ -46,6 +39,30 @@ public class TransactionsEntity {
 
     public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public Long getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(Long paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Double getTotalAmount() {
@@ -64,28 +81,12 @@ public class TransactionsEntity {
         this.method = method;
     }
 
-    public Long getGroupId() {
-        return groupId;
+    public String getTransactionType() {
+        return transactionType;
     }
 
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Long getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(Long updatedBy) {
-        this.updatedBy = updatedBy;
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
     }
 
     public Timestamp getCreateDate() {
@@ -94,13 +95,5 @@ public class TransactionsEntity {
 
     public void setCreateDate(Timestamp createDate) {
         this.createDate = createDate;
-    }
-
-    public Timestamp getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Timestamp updateDate) {
-        this.updateDate = updateDate;
     }
 }

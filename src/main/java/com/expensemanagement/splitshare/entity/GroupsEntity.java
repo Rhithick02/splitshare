@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -57,6 +58,9 @@ public class GroupsEntity {
     }
 
     public Set<UsersEntity> getUsers() {
+        if (users == null) {
+            return new HashSet<>();
+        }
         return users;
     }
 

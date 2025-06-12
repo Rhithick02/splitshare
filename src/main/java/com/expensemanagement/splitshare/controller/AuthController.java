@@ -1,10 +1,12 @@
 package com.expensemanagement.splitshare.controller;
 
+import com.expensemanagement.splitshare.dao.TransactionsDao;
 import com.expensemanagement.splitshare.dto.LoginRequest;
 import com.expensemanagement.splitshare.dto.LoginResponse;
 import com.expensemanagement.splitshare.dto.RegisterRequest;
 import com.expensemanagement.splitshare.dto.VerifyTokenRequest;
 import com.expensemanagement.splitshare.integration.ImageKitIntegration;
+import com.expensemanagement.splitshare.mapper.TxnMapper;
 import com.expensemanagement.splitshare.service.AuthService;
 import com.expensemanagement.splitshare.validate.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +25,16 @@ public class AuthController {
     private final Validator loginRequestValidator;
     private final Validator registerRequestValidator;
     private final AuthService authService;
+    private final TransactionsDao transactionsDao;
 
     @Autowired
     public AuthController(@Qualifier("loginRequestValidator") Validator loginRequestValidator,
                           @Qualifier("registerRequestValidator") Validator registerRequestValidator,
-                          AuthService authService) {
+                          AuthService authService, TransactionsDao transactionsDao) {
         this.loginRequestValidator = loginRequestValidator;
         this.registerRequestValidator = registerRequestValidator;
         this.authService = authService;
+        this.transactionsDao = transactionsDao;
     }
 
     @PostMapping("/send-otp")
@@ -56,6 +60,7 @@ public class AuthController {
     public ResponseEntity<LoginResponse> register(@RequestBody RegisterRequest registerRequest) {
         registerRequestValidator.validate(registerRequest);
         LoginResponse loginResponse = authService.processRegistration(registerRequest);
+        transactionsDao.populateTransactionHistory(loginResponse);
         return new ResponseEntity<>(loginResponse, HttpStatus.CREATED);
     }
 

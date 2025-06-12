@@ -1,7 +1,9 @@
 package com.expensemanagement.splitshare.controller;
 
+import com.expensemanagement.splitshare.dao.TransactionsDao;
 import com.expensemanagement.splitshare.dto.CreateGroupRequest;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
+import com.expensemanagement.splitshare.mapper.TxnMapper;
 import com.expensemanagement.splitshare.service.GroupService;
 import com.expensemanagement.splitshare.validate.Validator;
 import java.util.Map;
@@ -20,19 +22,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupController {
 
     private final GroupService groupService;
-
     private final Validator createGroupValidator;
+    private final TransactionsDao transactionsDao;
 
     @Autowired
-    public GroupController(GroupService groupService, @Qualifier("createGroupValidator") Validator createGroupValidator) {
+    public GroupController(GroupService groupService, @Qualifier("createGroupValidator") Validator createGroupValidator, TransactionsDao transactionsDao) {
         this.createGroupValidator = createGroupValidator;
         this.groupService = groupService;
+        this.transactionsDao = transactionsDao;
     }
 
     @PostMapping("/create-group")
     public ResponseEntity<?> createNewGroup(@RequestBody CreateGroupRequest createGroupRequest, @RequestHeader Map<String, String> requestHeaders) {
         createGroupValidator.validate(createGroupRequest);
         CreateGroupResponse createGroupResponse = groupService.createGroup(createGroupRequest);
+        transactionsDao.populateTransactionHistory(createGroupResponse);
         return new ResponseEntity<>(createGroupResponse, HttpStatus.OK);
     }
 }

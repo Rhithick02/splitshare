@@ -9,8 +9,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
@@ -20,7 +20,8 @@ import java.util.Set;
 @Table(name = "users")
 public class UsersEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator", allocationSize = 1)
     private Long userId;
 
     private String userName;
@@ -92,7 +93,7 @@ public class UsersEntity {
 
     public Set<GroupsEntity> getGroups() {
         if (this.groups == null) {
-            return new HashSet<>();
+            groups = new HashSet<>();
         }
         return groups;
     }

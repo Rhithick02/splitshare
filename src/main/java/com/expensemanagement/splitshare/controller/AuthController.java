@@ -5,10 +5,9 @@ import com.expensemanagement.splitshare.dto.LoginRequest;
 import com.expensemanagement.splitshare.dto.LoginResponse;
 import com.expensemanagement.splitshare.dto.RegisterRequest;
 import com.expensemanagement.splitshare.dto.VerifyTokenRequest;
-import com.expensemanagement.splitshare.integration.ImageKitIntegration;
-import com.expensemanagement.splitshare.mapper.TxnMapper;
 import com.expensemanagement.splitshare.service.AuthService;
 import com.expensemanagement.splitshare.validate.Validator;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -57,6 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Transactional
     public ResponseEntity<LoginResponse> register(@RequestBody RegisterRequest registerRequest) {
         registerRequestValidator.validate(registerRequest);
         LoginResponse loginResponse = authService.processRegistration(registerRequest);

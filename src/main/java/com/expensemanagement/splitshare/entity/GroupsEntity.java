@@ -23,6 +23,7 @@ public class GroupsEntity {
     @SequenceGenerator(name = "sequenceGenerator", allocationSize = 1)
     private Long groupId;
     private String groupName;
+    private String groupLink;
     private Timestamp createDate;
     private Timestamp updateDate;
 
@@ -84,5 +85,13 @@ public class GroupsEntity {
 
     public void setUpdateDate(Timestamp updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public String getGroupLink() {
+        return groupLink;
+    }
+
+    public void setGroupLink(String groupLink) {
+        this.groupLink = groupLink;
     }
 }

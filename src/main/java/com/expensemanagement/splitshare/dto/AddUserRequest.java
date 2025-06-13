@@ -7,4 +7,5 @@ import lombok.Data;
 public class AddUserRequest {
     private Set<String> phoneNumbers;
     private Long groupId;
+    private String groupLink;
 }

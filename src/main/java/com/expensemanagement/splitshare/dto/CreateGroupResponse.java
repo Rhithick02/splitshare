@@ -7,4 +7,5 @@ public class CreateGroupResponse {
     private String groupName;
     private Long groupId;
     private Long userId;
+    private String groupLink;
 }

@@ -2,6 +2,8 @@ package com.expensemanagement.splitshare.service;
 
 import com.expensemanagement.splitshare.dao.GroupsDao;
 import com.expensemanagement.splitshare.dao.UsersDao;
+import com.expensemanagement.splitshare.dto.AddUserRequest;
+import com.expensemanagement.splitshare.dto.AddUserResponse;
 import com.expensemanagement.splitshare.dto.CreateGroupRequest;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
 import com.expensemanagement.splitshare.entity.GroupsEntity;
@@ -50,5 +52,21 @@ public class GroupService {
         createGroupResponse.setGroupName(savedResponse.getGroupName());
         createGroupResponse.setUserId(user.getUserId());
         return createGroupResponse;
+    }
+
+    public AddUserResponse addUsers(AddUserRequest addUserRequest) {
+        AddUserResponse addUserResponse = new AddUserResponse();
+        Long groupId = addUserRequest.getGroupId();
+        GroupsEntity group = groupsDao.getGroupByGroupId(groupId);
+
+        for (String phoneNumber : addUserRequest.getPhoneNumbers()) {
+            UsersEntity user = usersDao.getUserByPhoneNumber(phoneNumber);
+            group.getUsers().add(user);
+            user.getGroups().add(group);
+            addUserResponse.getUserIds().add(user.getUserId());
+        }
+        addUserResponse.setGroupId(groupId);
+
+        return addUserResponse;
     }
 }

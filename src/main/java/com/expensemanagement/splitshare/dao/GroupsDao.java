@@ -21,7 +21,7 @@ public class GroupsDao {
         this.groupsRepository = groupsRepository;
     }
 
-    public GroupsEntity getGroupByGroupName(Long groupId) {
+    public GroupsEntity getGroupByGroupId(Long groupId) {
         GroupsEntity group = groupsRepository.findByGroupId(groupId);
         if (Objects.isNull(group)) {
             log.error("No valid group is found for the groupId - {}", groupId);
@@ -42,7 +42,7 @@ public class GroupsDao {
     public GroupsEntity upsertGroupData(GroupsEntity group) {
         GroupsEntity groupDataFromDb = null;
         if (Objects.nonNull(group.getGroupId()) && doesGroupIdExist(group.getGroupId())) {
-            groupDataFromDb = getGroupByGroupName(group.getGroupId());
+            groupDataFromDb = getGroupByGroupId(group.getGroupId());
         }
         if (Objects.nonNull(groupDataFromDb)) {
             if (Objects.isNull(group.getGroupName())) {

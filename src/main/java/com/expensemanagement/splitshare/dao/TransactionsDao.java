@@ -1,10 +1,12 @@
 package com.expensemanagement.splitshare.dao;
 
+import com.expensemanagement.splitshare.dto.AddUserResponse;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
 import com.expensemanagement.splitshare.dto.LoginResponse;
 import com.expensemanagement.splitshare.entity.TransactionsEntity;
 import com.expensemanagement.splitshare.mapper.TxnMapper;
 import com.expensemanagement.splitshare.repository.TransactionsRepository;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +26,17 @@ public class TransactionsDao {
     }
 
     public void populateTransactionHistory(Object entity) {
-        TransactionsEntity transactionsEntity = null;
+        List<TransactionsEntity> transactionsEntityList = null;
         if (entity instanceof LoginResponse) {
-            transactionsEntity = txnMapper.mapRegistration((LoginResponse) entity);
+            transactionsEntityList = txnMapper.mapRegistration((LoginResponse) entity);
         } else if (entity instanceof CreateGroupResponse) {
-            transactionsEntity = txnMapper.mapCreateGroup((CreateGroupResponse) entity);
+            transactionsEntityList = txnMapper.mapCreateGroup((CreateGroupResponse) entity);
+        } else if (entity instanceof AddUserResponse) {
+            transactionsEntityList = txnMapper.mapAddUsers((AddUserResponse) entity);
         }
 
-        if (Objects.nonNull(transactionsEntity)) {
-            transactionsRepository.save(transactionsEntity);
+        if (Objects.nonNull(transactionsEntityList)) {
+            transactionsRepository.saveAll(transactionsEntityList);
         }
     }
 }

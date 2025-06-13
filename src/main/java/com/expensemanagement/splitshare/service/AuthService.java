@@ -1,10 +1,12 @@
 package com.expensemanagement.splitshare.service;
 
+import com.expensemanagement.splitshare.dao.OtpDao;
 import com.expensemanagement.splitshare.dao.UsersDao;
 import com.expensemanagement.splitshare.dto.LoginRequest;
 import com.expensemanagement.splitshare.dto.LoginResponse;
 import com.expensemanagement.splitshare.dto.RegisterRequest;
 import com.expensemanagement.splitshare.entity.GroupsEntity;
+import com.expensemanagement.splitshare.entity.OtpEntity;
 import com.expensemanagement.splitshare.entity.UsersEntity;
 import com.expensemanagement.splitshare.exception.BadRequestException;
 import com.expensemanagement.splitshare.exception.NotFoundException;
@@ -14,6 +16,7 @@ import com.expensemanagement.splitshare.util.JwtUtil;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +26,17 @@ public class AuthService {
 
     private final UsersDao usersDao;
     private final OtpService otpService;
+    private final OtpDao otpDao;
     private final TwilioSmsIntegration twilioSmsIntegration;
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public AuthService(UsersDao usersDao, OtpService otpService, TwilioSmsIntegration twilioSmsIntegration, JwtUtil jwtUtil) {
+    public AuthService(UsersDao usersDao, OtpService otpService, TwilioSmsIntegration twilioSmsIntegration, JwtUtil jwtUtil, OtpDao otpDao) {
         this.usersDao = usersDao;
         this.otpService = otpService;
         this.twilioSmsIntegration = twilioSmsIntegration;
         this.jwtUtil = jwtUtil;
+        this.otpDao = otpDao;
     }
 
     public void sendSms(LoginRequest loginRequest) {
@@ -46,8 +51,11 @@ public class AuthService {
             throw new NotFoundException("phoneNumber", phoneNumber);
         }
         // Generate and send Otp
-        String otp = otpService.generateOtp(phoneNumber);
-        twilioSmsIntegration.sendSms(phoneNumber, otp);
+        Pair<String, String> otps = otpService.generateOtp(phoneNumber, loginRequest.getEmailId());
+        twilioSmsIntegration.sendSms(phoneNumber, otps.getLeft());
+        if (loginRequest.isRegistrationRequest()) {
+            // send email otp
+        }
     }
 
     public LoginResponse processLogin(LoginRequest loginRequest) {
@@ -57,9 +65,12 @@ public class AuthService {
         String phoneNumber = countryCode + nationalNumber;
         // Check if user has registered
         UsersEntity user = usersDao.getUserByPhoneNumber(phoneNumber);
-        // Generate and send Otp
         if (!otpService.verifyOtp(phoneNumber, loginRequest.getOtp())) {
-            // throw exception
+            OtpEntity otpEntity = otpDao.getOtpRecordByPhoneNumber(phoneNumber);
+            String otpDigest = otpService.getMD5HashValue(loginRequest.getOtp());
+            if (!otpDigest.equalsIgnoreCase(otpEntity.getPhoneOtp())) {
+                // throw exception
+            }
         }
         String accessToken = jwtUtil.generateJwAccessToken(user.getUserId(), phoneNumber);
 
@@ -87,7 +98,11 @@ public class AuthService {
             throw new BadRequestException(String.format("Phonenumber %s already exists", phoneNumber));
         }
         if (!otpService.verifyOtp(phoneNumber, registerRequest.getPhoneOtp())) {
-            // throw exception
+            OtpEntity otpEntity = otpDao.getOtpRecordByPhoneNumber(phoneNumber);
+            String otpDigest = otpService.getMD5HashValue(registerRequest.getPhoneOtp());
+            if (!otpDigest.equalsIgnoreCase(otpEntity.getPhoneOtp())) {
+                // throw exception
+            }
         }
 
         // Build userEntity request and Save to DB

@@ -5,6 +5,7 @@ import com.expensemanagement.splitshare.exception.BadRequestException;
 import com.expensemanagement.splitshare.validate.Validator;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,7 +23,7 @@ public class AddUsersValidator implements Validator {
             Optional<String> invalidPhoneNumbers = addUserRequest
                     .getPhoneNumbers()
                     .stream()
-                    .filter(Objects::isNull)
+                    .filter(phoneNumber -> Objects.isNull(phoneNumber) || StringUtils.isEmpty(phoneNumber))
                     .findAny();
             if (invalidPhoneNumbers.isPresent()) {
                 throw new BadRequestException("Phone numbers cannot be empty");

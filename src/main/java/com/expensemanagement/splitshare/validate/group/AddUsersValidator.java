@@ -17,7 +17,7 @@ public class AddUsersValidator implements Validator {
         String errorMsg = "Missing field %s in request";
         if (request instanceof AddUserRequest) {
             AddUserRequest addUserRequest = (AddUserRequest) request;
-            if (Objects.isNull(addUserRequest.getGroupId())) {
+            if (Objects.isNull(addUserRequest.getGroupId()) && StringUtils.isEmpty(addUserRequest.getGroupLink())) {
                 throw new BadRequestException(String.format(errorMsg, "groupId"));
             }
             Optional<String> invalidPhoneNumbers = addUserRequest

@@ -10,7 +10,12 @@ import com.expensemanagement.splitshare.entity.GroupsEntity;
 import com.expensemanagement.splitshare.entity.UsersEntity;
 import com.expensemanagement.splitshare.integration.ImageKitIntegration;
 import io.imagekit.sdk.models.results.Result;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +28,14 @@ public class GroupService {
     private final UsersDao usersDao;
     private final ImageKitIntegration imageKitIntegration;
 
+    private final MessageDigest digest;
+
     @Autowired
-    public GroupService(GroupsDao groupsDao, UsersDao usersDao, ImageKitIntegration imageKitIntegration) {
+    public GroupService(GroupsDao groupsDao, UsersDao usersDao, ImageKitIntegration imageKitIntegration) throws NoSuchAlgorithmException {
         this.groupsDao = groupsDao;
         this.usersDao = usersDao;
         this.imageKitIntegration = imageKitIntegration;
+        this.digest = MessageDigest.getInstance("SHA-256");
     }
 
     public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
@@ -37,6 +45,7 @@ public class GroupService {
         // Create a new group and to user
         GroupsEntity groupsEntity = new GroupsEntity();
         groupsEntity.setGroupName(createGroupRequest.getGroupName());
+        groupsEntity.setGroupLink(generateToken(createGroupRequest.getGroupName()));
         groupsEntity.getUsers().add(user);
         user.getGroups().add(groupsEntity);
         GroupsEntity savedResponse = groupsDao.upsertGroupData(groupsEntity);
@@ -51,13 +60,20 @@ public class GroupService {
         createGroupResponse.setGroupId(savedResponse.getGroupId());
         createGroupResponse.setGroupName(savedResponse.getGroupName());
         createGroupResponse.setUserId(user.getUserId());
+        createGroupResponse.setGroupLink(savedResponse.getGroupLink());
         return createGroupResponse;
     }
 
     public AddUserResponse addUsers(AddUserRequest addUserRequest) {
         AddUserResponse addUserResponse = new AddUserResponse();
-        Long groupId = addUserRequest.getGroupId();
-        GroupsEntity group = groupsDao.getGroupByGroupId(groupId);
+        GroupsEntity group;
+        if (Objects.nonNull(addUserRequest.getGroupId())) {
+            Long groupId = addUserRequest.getGroupId();
+            group = groupsDao.getGroupByGroupId(groupId);
+        } else {
+            group = groupsDao.getGroupByGroupLink(addUserRequest.getGroupLink());
+        }
+
 
         for (String phoneNumber : addUserRequest.getPhoneNumbers()) {
             UsersEntity user = usersDao.getUserByPhoneNumber(phoneNumber);
@@ -65,8 +81,16 @@ public class GroupService {
             user.getGroups().add(group);
             addUserResponse.getUserIds().add(user.getUserId());
         }
-        addUserResponse.setGroupId(groupId);
+        addUserResponse.setGroupId(group.getGroupId());
 
         return addUserResponse;
+    }
+
+    private String generateToken(String groupName) {
+        String uuid = UUID.randomUUID().toString();
+        String randomString = uuid + groupName + System.currentTimeMillis();
+        byte[] hash = digest.digest(randomString.getBytes(StandardCharsets.UTF_8));
+        String encoded = Base64.getEncoder().encodeToString(hash);
+        return encoded.substring(0, 12);
     }
 }

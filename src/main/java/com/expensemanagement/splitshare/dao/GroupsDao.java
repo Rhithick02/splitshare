@@ -52,4 +52,14 @@ public class GroupsDao {
         GroupsEntity savedResponse = groupsRepository.save(group);
         return savedResponse;
     }
+
+    public GroupsEntity getGroupByGroupLink(String groupLink) {
+        GroupsEntity group = groupsRepository.findByGroupLink(groupLink);
+        if (Objects.isNull(group)) {
+            log.error("No valid group is found for the groupLink - {}", groupLink);
+            throw new NotFoundException("groupId", groupLink);
+        }
+        log.info("Found groupId = {} with the groupName = {}", group.getGroupId(), group.getGroupName());
+        return group;
+    }
 }

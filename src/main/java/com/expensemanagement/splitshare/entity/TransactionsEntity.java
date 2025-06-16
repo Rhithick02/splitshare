@@ -22,7 +22,6 @@ public class TransactionsEntity {
     private Long groupId;
     private Long userId;
     private Double totalAmount;
-    private String method;
     private String transactionType;
     private Timestamp createDate;
 
@@ -70,14 +69,6 @@ public class TransactionsEntity {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
     }
 
     public String getTransactionType() {

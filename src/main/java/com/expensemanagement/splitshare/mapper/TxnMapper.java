@@ -2,6 +2,7 @@ package com.expensemanagement.splitshare.mapper;
 
 import com.expensemanagement.splitshare.dto.AddUserResponse;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
+import com.expensemanagement.splitshare.dto.CreateUpdateSplitResponse;
 import com.expensemanagement.splitshare.dto.LoginResponse;
 import com.expensemanagement.splitshare.entity.TransactionsEntity;
 import com.expensemanagement.splitshare.enums.TransactionTypeEnum;
@@ -41,6 +42,19 @@ public class TxnMapper {
             transactionsEntity.setTransactionType(TransactionTypeEnum.JOIN_GROUP.toString());
             transactionsEntityList.add(transactionsEntity);
         }
+        return transactionsEntityList;
+    }
+
+    public List<TransactionsEntity> mapCreateUpdateSplit(CreateUpdateSplitResponse createUpdateSplitResponse) {
+        List<TransactionsEntity> transactionsEntityList = new ArrayList<>();
+        TransactionsEntity transactionsEntity = new TransactionsEntity();
+        transactionsEntity.setGroupId(createUpdateSplitResponse.getGroupId());
+        String transactionType = createUpdateSplitResponse.isUpdate() ? TransactionTypeEnum.UPDATE_SPLIT.toString() : TransactionTypeEnum.CREATE_SPLIT.toString();
+        transactionsEntity.setTransactionType(transactionType);
+        transactionsEntity.setPaymentId(createUpdateSplitResponse.getPaymentId());
+        transactionsEntity.setTotalAmount(createUpdateSplitResponse.getTotalAmount());
+        transactionsEntity.setUserId(createUpdateSplitResponse.getUserId());
+        transactionsEntityList.add(transactionsEntity);
         return transactionsEntityList;
     }
 }

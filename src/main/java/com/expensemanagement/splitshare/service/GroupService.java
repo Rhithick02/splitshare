@@ -8,11 +8,13 @@ import com.expensemanagement.splitshare.dto.CreateGroupRequest;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
 import com.expensemanagement.splitshare.entity.GroupsEntity;
 import com.expensemanagement.splitshare.entity.UsersEntity;
+import com.expensemanagement.splitshare.exception.InternalServerException;
 import com.expensemanagement.splitshare.integration.ImageKitIntegration;
 import io.imagekit.sdk.models.results.Result;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
@@ -39,51 +41,59 @@ public class GroupService {
     }
 
     public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
-        // Get the userEntity object
-        UsersEntity user = usersDao.getUserByUserId(createGroupRequest.getUserId());
+        try {
+            // Get the userEntity object
+            UsersEntity user = usersDao.getUserByUserId(createGroupRequest.getUserId());
 
-        // Create a new group and to user
-        GroupsEntity groupsEntity = new GroupsEntity();
-        groupsEntity.setGroupName(createGroupRequest.getGroupName());
-        groupsEntity.setGroupLink(generateToken(createGroupRequest.getGroupName()));
-        groupsEntity.getUsers().add(user);
-        user.getGroups().add(groupsEntity);
-        GroupsEntity savedResponse = groupsDao.upsertGroupData(groupsEntity);
+            // Create a new group and to user
+            GroupsEntity groupsEntity = new GroupsEntity();
+            groupsEntity.setGroupName(createGroupRequest.getGroupName());
+            groupsEntity.setGroupLink(generateToken(createGroupRequest.getGroupName()));
+            groupsEntity.getUsers().add(user);
+            user.getGroups().add(groupsEntity);
+            GroupsEntity savedResponse = groupsDao.upsertGroupData(groupsEntity);
 
-        // Upload image to imageKit if present
-        if (Objects.nonNull(createGroupRequest.getGroupImage())) {
-            Result result = imageKitIntegration.uploadImage(createGroupRequest.getGroupImage(), savedResponse.getGroupId());
+            // Upload image to imageKit if present
+            if (Objects.nonNull(createGroupRequest.getGroupImage())) {
+                Result result = imageKitIntegration.uploadImage(createGroupRequest.getGroupImage(), savedResponse.getGroupId());
+            }
+
+            // Return response
+            CreateGroupResponse createGroupResponse = new CreateGroupResponse();
+            createGroupResponse.setGroupId(savedResponse.getGroupId());
+            createGroupResponse.setGroupName(savedResponse.getGroupName());
+            createGroupResponse.setUserId(user.getUserId());
+            createGroupResponse.setGroupLink(savedResponse.getGroupLink());
+            return createGroupResponse;
+        } catch (SQLException ex) {
+            throw new InternalServerException(ex.getMessage());
         }
-
-        // Return response
-        CreateGroupResponse createGroupResponse = new CreateGroupResponse();
-        createGroupResponse.setGroupId(savedResponse.getGroupId());
-        createGroupResponse.setGroupName(savedResponse.getGroupName());
-        createGroupResponse.setUserId(user.getUserId());
-        createGroupResponse.setGroupLink(savedResponse.getGroupLink());
-        return createGroupResponse;
     }
 
     public AddUserResponse addUsers(AddUserRequest addUserRequest) {
-        AddUserResponse addUserResponse = new AddUserResponse();
-        GroupsEntity group;
-        if (Objects.nonNull(addUserRequest.getGroupId())) {
-            Long groupId = addUserRequest.getGroupId();
-            group = groupsDao.getGroupByGroupId(groupId);
-        } else {
-            group = groupsDao.getGroupByGroupLink(addUserRequest.getGroupLink());
+        try {
+            AddUserResponse addUserResponse = new AddUserResponse();
+            GroupsEntity group;
+            if (Objects.nonNull(addUserRequest.getGroupId())) {
+                Long groupId = addUserRequest.getGroupId();
+                group = groupsDao.getGroupByGroupId(groupId);
+            } else {
+                group = groupsDao.getGroupByGroupLink(addUserRequest.getGroupLink());
+            }
+
+            for (String phoneNumber : addUserRequest.getPhoneNumbers()) {
+                UsersEntity user = usersDao.getUserByPhoneNumber(phoneNumber);
+                group.getUsers().add(user);
+                user.getGroups().add(group);
+                addUserResponse.getUserIds().add(user.getUserId());
+            }
+            groupsDao.upsertGroupData(group);
+            addUserResponse.setGroupId(group.getGroupId());
+
+            return addUserResponse;
+        } catch (SQLException ex) {
+            throw new InternalServerException(ex.getMessage());
         }
-
-
-        for (String phoneNumber : addUserRequest.getPhoneNumbers()) {
-            UsersEntity user = usersDao.getUserByPhoneNumber(phoneNumber);
-            group.getUsers().add(user);
-            user.getGroups().add(group);
-            addUserResponse.getUserIds().add(user.getUserId());
-        }
-        addUserResponse.setGroupId(group.getGroupId());
-
-        return addUserResponse;
     }
 
     private String generateToken(String groupName) {

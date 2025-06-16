@@ -3,6 +3,7 @@ package com.expensemanagement.splitshare.dao;
 import com.expensemanagement.splitshare.entity.UsersEntity;
 import com.expensemanagement.splitshare.exception.NotFoundException;
 import com.expensemanagement.splitshare.repository.UsersRepository;
+import java.sql.SQLException;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class UsersDao {
         return true;
     }
 
-    public UsersEntity upsertUserData(UsersEntity user) {
+    public UsersEntity upsertUserData(UsersEntity user) throws SQLException {
         UsersEntity userDataFromDb = null;
         if (Objects.nonNull(user.getPhoneNumber()) && doesPhoneNumberExist(user.getPhoneNumber())) {
             userDataFromDb = getUserByPhoneNumber(user.getPhoneNumber());
@@ -52,8 +53,12 @@ public class UsersDao {
                 user.setUserName(userDataFromDb.getUserName());
             }
         }
-        UsersEntity savedResponse = usersRepository.save(user);
-        return savedResponse;
+        try {
+            UsersEntity savedResponse = usersRepository.save(user);
+            return savedResponse;
+        } catch (Exception ex) {
+            throw new SQLException(ex.getMessage());
+        }
     }
 
     public UsersEntity getUserByUserId(Long userId) {

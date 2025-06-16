@@ -5,6 +5,7 @@ import com.expensemanagement.splitshare.entity.UsersEntity;
 import com.expensemanagement.splitshare.exception.NotFoundException;
 import com.expensemanagement.splitshare.repository.GroupsRepository;
 import com.expensemanagement.splitshare.repository.UsersRepository;
+import java.sql.SQLException;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class GroupsDao {
         return true;
     }
 
-    public GroupsEntity upsertGroupData(GroupsEntity group) {
+    public GroupsEntity upsertGroupData(GroupsEntity group) throws SQLException {
         GroupsEntity groupDataFromDb = null;
         if (Objects.nonNull(group.getGroupId()) && doesGroupIdExist(group.getGroupId())) {
             groupDataFromDb = getGroupByGroupId(group.getGroupId());
@@ -48,9 +49,17 @@ public class GroupsDao {
             if (Objects.isNull(group.getGroupName())) {
                 group.setGroupName(groupDataFromDb.getGroupName());
             }
+            if (Objects.isNull(group.getGroupLink())) {
+                group.setGroupLink(groupDataFromDb.getGroupLink());
+            }
         }
-        GroupsEntity savedResponse = groupsRepository.save(group);
-        return savedResponse;
+        try {
+            GroupsEntity savedResponse = groupsRepository.save(group);
+            return savedResponse;
+        } catch (Exception ex) {
+            log.error("Exception occurred while trying to save the GroupsEntity for groupName = {}. Exception - {}", group.getGroupName(), ex.getMessage());
+            throw new SQLException(ex.getMessage());
+        }
     }
 
     public GroupsEntity getGroupByGroupLink(String groupLink) {

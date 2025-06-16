@@ -55,6 +55,11 @@ public class AuthController {
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
+    /* TODO:
+        1. Validate userId from header and payload
+        2. Create an exception ticket to pass
+        3. Change the auth verification method
+     */
     @PostMapping("/register")
     @Transactional
     public ResponseEntity<LoginResponse> register(@RequestBody RegisterRequest registerRequest) {

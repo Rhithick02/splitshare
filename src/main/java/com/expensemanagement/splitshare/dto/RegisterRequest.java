@@ -9,4 +9,5 @@ public class RegisterRequest {
     private String nationalNumber;
     private String countryCode;
     private String phoneOtp;
+    private String emailOtp;
 }

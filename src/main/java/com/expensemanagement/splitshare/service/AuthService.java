@@ -139,7 +139,7 @@ public class AuthService {
         }
     }
 
-    public void verifyToken(String jwt, Long userId, String phoneNumber) {
-        jwtUtil.decodeJWToken(jwt, userId, phoneNumber);
+    public void verifyToken(String jwt, Long userId) {
+        jwtUtil.decodeJWToken(jwt, userId);
     }
 }

@@ -65,6 +65,7 @@ public class PaymentService {
             PaymentDetailsEntity responseSavedToDb = paymentsDao.savePaymentDetail(paymentDetailsEntity);
             createUpdateSplitResponse.setPaymentId(responseSavedToDb.getPaymentId());
             createUpdateSplitResponse.setGroupId(responseSavedToDb.getGroupId());
+            createUpdateSplitResponse.setUserId(createUpdateSplitResponse.getUserId());
             return createUpdateSplitResponse;
         } catch (SQLException ex) {
             throw new InternalServerException(ex.getMessage());

@@ -10,8 +10,6 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // TODO: Check all thrown exceptions and handled
-
     @ExceptionHandler(value = BadRequestException.class)
     public ResponseEntity<ErrorDetails> handleBadRequestException(BadRequestException badRequestException, WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails("", badRequestException.getMessage(), webRequest.getDescription(false));

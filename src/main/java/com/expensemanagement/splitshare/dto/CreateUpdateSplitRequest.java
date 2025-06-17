@@ -10,6 +10,7 @@ public class CreateUpdateSplitRequest {
     private List<Long> payerUserIdList;
     private List<Long> debtorUserIdList;
     private Long groupId;
+    private Long userId;
     private SplitModel debtorSplitModel;
     private SplitModel payerSplitModel;
     private Double totalAmount;

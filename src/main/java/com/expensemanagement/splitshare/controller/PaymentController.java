@@ -39,7 +39,6 @@ public class PaymentController {
     @PostMapping("/add-split")
     @Transactional
     public ResponseEntity<?> addUpdateSplit(@RequestBody CreateUpdateSplitRequest createUpdateSplitRequest, @RequestHeader Map<String, String> requestHeaders) {
-        // TODO: Validate addUpdateSplit request
         addUpdateSplitValidator.validate(createUpdateSplitRequest);
         CreateUpdateSplitResponse createGroupResponse = paymentService.createOrUpdateSplit(createUpdateSplitRequest);
         transactionsDao.populateTransactionHistory(createGroupResponse);

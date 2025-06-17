@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String authorization = request.getHeader("Authorization");
             authorizationValidator.validate(authorization);
             Map<String, String> authParams = headerUtil.convertAuthorizationToParams(authorization);
-            jwtUtil.decodeJWToken(authParams.get("token"), Long.parseLong(authParams.get("user_id")), authParams.get("phone_number"));
+            jwtUtil.decodeJWToken(authParams.get("token"), Long.parseLong(authParams.get("user_id")));
             filterChain.doFilter(request, response);
         } catch (UnauthorizedException ex) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid auth credentials");

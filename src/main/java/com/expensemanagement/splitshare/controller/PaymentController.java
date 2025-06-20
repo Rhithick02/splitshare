@@ -1,19 +1,19 @@
 package com.expensemanagement.splitshare.controller;
 
 import com.expensemanagement.splitshare.dao.TransactionsDao;
-import com.expensemanagement.splitshare.dto.CreateGroupRequest;
-import com.expensemanagement.splitshare.dto.CreateGroupResponse;
 import com.expensemanagement.splitshare.dto.CreateUpdateSplitRequest;
 import com.expensemanagement.splitshare.dto.CreateUpdateSplitResponse;
+import com.expensemanagement.splitshare.dto.GetGroupTransactionsRequest;
 import com.expensemanagement.splitshare.service.PaymentService;
 import com.expensemanagement.splitshare.validate.Validator;
-import com.expensemanagement.splitshare.validate.payment.AddUpdateSplitValidator;
 import jakarta.transaction.Transactional;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -40,8 +40,16 @@ public class PaymentController {
     @Transactional
     public ResponseEntity<?> addUpdateSplit(@RequestBody CreateUpdateSplitRequest createUpdateSplitRequest, @RequestHeader Map<String, String> requestHeaders) {
         addUpdateSplitValidator.validate(createUpdateSplitRequest);
-        CreateUpdateSplitResponse createGroupResponse = paymentService.createOrUpdateSplit(createUpdateSplitRequest);
-        transactionsDao.populateTransactionHistory(createGroupResponse);
-        return new ResponseEntity<>(createGroupResponse, HttpStatus.OK);
+        paymentService.createOrUpdateSplit(createUpdateSplitRequest);
+//        transactionsDao.populateTransactionHistory(createGroupResponse);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
+//    @GetMapping("/get-group-txn/{groupId}")
+//    @Transactional
+//    public ResponseEntity<?> getGroupTransactions(@PathVariable Long groupId, @RequestHeader Map<String, String> requestHeaders) {
+////        CreateUpdateSplitResponse createGroupResponse = paymentService.createOrUpdateSplit(createUpdateSplitRequest);
+////        transactionsDao.populateTransactionHistory(createGroupResponse);
+//        return new ResponseEntity<>(createGroupResponse, HttpStatus.OK);
+//    }
 }

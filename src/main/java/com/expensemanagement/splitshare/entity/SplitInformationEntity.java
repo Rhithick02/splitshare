@@ -61,4 +61,12 @@ public class SplitInformationEntity {
     public void setPaymentParty(String paymentParty) {
         this.paymentParty = paymentParty;
     }
+
+    public PaymentDetailsEntity getPaymentDetail() {
+        return paymentDetail;
+    }
+
+    public void setPaymentDetail(PaymentDetailsEntity paymentDetail) {
+        this.paymentDetail = paymentDetail;
+    }
 }

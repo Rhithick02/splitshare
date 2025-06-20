@@ -45,7 +45,7 @@ public class JwtUtil {
     }
 
     public void decodeJWToken(String jwt, Long userId) {
-        if (userId == allowedUserId) {
+        if (userId.equals(allowedUserId)) {
             return;
         }
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret);

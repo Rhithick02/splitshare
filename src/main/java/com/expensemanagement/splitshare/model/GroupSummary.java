@@ -3,7 +3,7 @@ package com.expensemanagement.splitshare.model;
 import lombok.Data;
 
 @Data
-public class GroupInformation {
+public class GroupSummary {
     private Long groupId;
     private String groupName;
     private Double debtAmount;

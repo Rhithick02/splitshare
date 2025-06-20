@@ -62,6 +62,15 @@ public class GroupsDao {
         }
     }
 
+    public GroupsEntity saveToDb(GroupsEntity group) throws SQLException {
+        try {
+            return groupsRepository.save(group);
+        } catch (Exception ex) {
+            log.error("Exception occurred while trying to save the GroupsEntity for groupName = {}. Exception - {}", group.getGroupName(), ex.getMessage());
+            throw new SQLException(ex.getMessage());
+        }
+    }
+
     public GroupsEntity getGroupByGroupLink(String groupLink) {
         GroupsEntity group = groupsRepository.findByGroupLink(groupLink);
         if (Objects.isNull(group)) {

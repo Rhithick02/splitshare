@@ -1,7 +1,5 @@
 package com.expensemanagement.splitshare.dto;
 
-import com.expensemanagement.splitshare.model.SplitModel;
-import java.util.List;
 import java.util.Map;
 import lombok.Data;
 

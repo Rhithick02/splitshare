@@ -1,14 +1,17 @@
 package com.expensemanagement.splitshare.dto;
 
-import com.expensemanagement.splitshare.model.SplitModel;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Data
 public class CreateUpdateSplitResponse {
     private Long userId;
-    private Long paymentId;
     private Long groupId;
-    private boolean isUpdate;
-    private Double totalAmount;
+    private String groupName;
+    private Long paymentId;
+    private boolean isUpdatePayment;
+    private Double paymentAmount;
+    Map<Long, List<Pair<Long, Double>>> userPaymentTrack;
 }

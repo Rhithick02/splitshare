@@ -18,6 +18,8 @@ public class SplitInformationEntity {
     private Double splitFraction;
     private Double amount;
     private String paymentParty; // Enum can be used for better type safety
+    private boolean outdated;
+    private Long version;
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private PaymentDetailsEntity paymentDetail;
@@ -68,5 +70,21 @@ public class SplitInformationEntity {
 
     public void setPaymentDetail(PaymentDetailsEntity paymentDetail) {
         this.paymentDetail = paymentDetail;
+    }
+
+    public boolean isOutdated() {
+        return outdated;
+    }
+
+    public void setOutdated(boolean outdated) {
+        this.outdated = outdated;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

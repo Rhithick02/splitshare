@@ -49,11 +49,11 @@ public class TxnMapper {
         List<TransactionsEntity> transactionsEntityList = new ArrayList<>();
         TransactionsEntity transactionsEntity = new TransactionsEntity();
         transactionsEntity.setGroupId(createUpdateSplitResponse.getGroupId());
-        String transactionType = createUpdateSplitResponse.isUpdate() ? TransactionTypeEnum.UPDATE_SPLIT.toString() : TransactionTypeEnum.CREATE_SPLIT.toString();
-        transactionsEntity.setTransactionType(transactionType);
-        transactionsEntity.setPaymentId(createUpdateSplitResponse.getPaymentId());
-        transactionsEntity.setTotalAmount(createUpdateSplitResponse.getTotalAmount());
         transactionsEntity.setUserId(createUpdateSplitResponse.getUserId());
+        transactionsEntity.setPaymentId(createUpdateSplitResponse.getPaymentId());
+        String transactionType = createUpdateSplitResponse.isUpdatePayment() ? TransactionTypeEnum.UPDATE_SPLIT.toString() : TransactionTypeEnum.CREATE_SPLIT.toString();
+        transactionsEntity.setTransactionType(transactionType);
+        transactionsEntity.setTotalAmount(createUpdateSplitResponse.getPaymentAmount());
         transactionsEntityList.add(transactionsEntity);
         return transactionsEntityList;
     }

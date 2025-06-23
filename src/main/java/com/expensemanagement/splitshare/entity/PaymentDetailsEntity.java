@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
@@ -32,12 +33,21 @@ public class PaymentDetailsEntity {
                 orphanRemoval = true)
     private Set<SplitInformationEntity> split;
 
+    @OneToMany( mappedBy = "paymentDetail",
+                cascade = CascadeType.ALL,
+                fetch = FetchType.EAGER,
+                orphanRemoval = true)
+    private Set<UserSplitPaymentsEntity> userSplitPayments;
+
     @ManyToOne
     @JoinColumn(name = "group_id")
     private GroupsEntity group;
 
     private Timestamp createDate;
     private Timestamp updateDate;
+
+    @Transient
+    private boolean isNew;
 
     @PrePersist
     public void setCreationAndUpdationDate() {
@@ -109,5 +119,21 @@ public class PaymentDetailsEntity {
 
     public void setGroup(GroupsEntity group) {
         this.group = group;
+    }
+
+    public Set<UserSplitPaymentsEntity> getUserSplitPayments() {
+        return userSplitPayments;
+    }
+
+    public void setUserSplitPayments(Set<UserSplitPaymentsEntity> userSplitPayments) {
+        this.userSplitPayments = userSplitPayments;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
     }
 }

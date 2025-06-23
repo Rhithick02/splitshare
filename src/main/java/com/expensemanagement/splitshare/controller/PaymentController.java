@@ -36,13 +36,13 @@ public class PaymentController {
         this.transactionsDao = transactionsDao;
     }
 
-    @PostMapping("/add-split")
+    @PostMapping({"/add-split", "/update-split"})
     @Transactional
     public ResponseEntity<?> addUpdateSplit(@RequestBody CreateUpdateSplitRequest createUpdateSplitRequest, @RequestHeader Map<String, String> requestHeaders) {
         addUpdateSplitValidator.validate(createUpdateSplitRequest);
-        paymentService.createOrUpdateSplit(createUpdateSplitRequest);
-//        transactionsDao.populateTransactionHistory(createGroupResponse);
-        return new ResponseEntity<>(HttpStatus.OK);
+        CreateUpdateSplitResponse createUpdateSplitResponse = paymentService.createUpdateSplit(createUpdateSplitRequest);
+        transactionsDao.populateTransactionHistory(createUpdateSplitResponse);
+        return new ResponseEntity<>(createUpdateSplitResponse, HttpStatus.OK);
     }
 
 //    @GetMapping("/get-group-txn/{groupId}")

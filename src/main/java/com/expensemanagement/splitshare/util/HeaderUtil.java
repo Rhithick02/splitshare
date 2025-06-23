@@ -18,7 +18,7 @@ public class HeaderUtil {
                 authParams.put(param[0], param[1]);
             }
         }
-        if (authParams.size() != 3) {
+        if (authParams.size() != 2) {
             throw new UnauthorizedException();
         }
         return authParams;

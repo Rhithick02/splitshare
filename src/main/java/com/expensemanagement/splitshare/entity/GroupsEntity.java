@@ -1,10 +1,13 @@
 package com.expensemanagement.splitshare.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
@@ -29,6 +32,18 @@ public class GroupsEntity {
 
     @ManyToMany(mappedBy = "groups")
     private Set<UsersEntity> users;
+
+    @OneToMany( mappedBy = "group",
+                cascade = CascadeType.ALL,
+                fetch = FetchType.EAGER,
+                orphanRemoval = true)
+    private Set<PaymentDetailsEntity> payments;
+
+    @OneToMany( mappedBy = "group",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            orphanRemoval = true)
+    private Set<UserSplitDetailsEntity> userSplitDetails;
 
     @PrePersist
     public void setCreationAndUpdationDate() {
@@ -93,5 +108,21 @@ public class GroupsEntity {
 
     public void setGroupLink(String groupLink) {
         this.groupLink = groupLink;
+    }
+
+    public Set<PaymentDetailsEntity> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(Set<PaymentDetailsEntity> payments) {
+        this.payments = payments;
+    }
+
+    public Set<UserSplitDetailsEntity> getUserSplitDetails() {
+        return userSplitDetails;
+    }
+
+    public void setUserSplitDetails(Set<UserSplitDetailsEntity> userSplitDetails) {
+        this.userSplitDetails = userSplitDetails;
     }
 }

@@ -5,6 +5,7 @@ import com.expensemanagement.splitshare.dto.AddUserRequest;
 import com.expensemanagement.splitshare.dto.AddUserResponse;
 import com.expensemanagement.splitshare.dto.CreateGroupRequest;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
+import com.expensemanagement.splitshare.dto.GroupDetailsResponse;
 import com.expensemanagement.splitshare.service.GroupService;
 import com.expensemanagement.splitshare.validate.Validator;
 import jakarta.transaction.Transactional;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -53,5 +56,12 @@ public class GroupController {
         AddUserResponse addUserResponse = groupService.addUsers(addUserRequest);
         transactionsDao.populateTransactionHistory(addUserResponse);
         return new ResponseEntity<>(addUserResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/{groupId}")
+    @Transactional
+    public ResponseEntity<?> getGroupTransactions(@PathVariable Long groupId, @RequestHeader Map<String, String> requestHeaders) {
+        GroupDetailsResponse groupDetailsResponse = groupService.getGroupDetails(groupId);
+        return new ResponseEntity<>(groupDetailsResponse, HttpStatus.OK);
     }
 }

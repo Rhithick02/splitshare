@@ -4,8 +4,8 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-public class SplitModel {
-    private String splitMethod;
+public class UserSplitDetail {
+
     private Map<Long, Double> splitMap;
 
 }

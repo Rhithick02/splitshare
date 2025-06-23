@@ -1,6 +1,6 @@
 package com.expensemanagement.splitshare.dto;
 
-import com.expensemanagement.splitshare.model.GroupInformation;
+import com.expensemanagement.splitshare.model.GroupSummary;
 import java.util.List;
 import lombok.Data;
 
@@ -11,6 +11,6 @@ public class LoginResponse {
     private Long userId;
     private String phoneNumber;
     private String emailId;
-    private List<GroupInformation> groupInformationList;
+    private List<GroupSummary> groupSummaryList;
 
 }

@@ -3,6 +3,7 @@ package com.expensemanagement.splitshare.dao;
 import com.expensemanagement.splitshare.dto.AddUserResponse;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
 import com.expensemanagement.splitshare.dto.CreateUpdateSplitResponse;
+import com.expensemanagement.splitshare.dto.GroupDetailsResponse;
 import com.expensemanagement.splitshare.dto.LoginResponse;
 import com.expensemanagement.splitshare.entity.TransactionsEntity;
 import com.expensemanagement.splitshare.mapper.TxnMapper;
@@ -34,7 +35,7 @@ public class TransactionsDao {
             transactionsEntityList = txnMapper.mapCreateGroup((CreateGroupResponse) entity);
         } else if (entity instanceof AddUserResponse) {
             transactionsEntityList = txnMapper.mapAddUsers((AddUserResponse) entity);
-        } else if (entity instanceof CreateGroupResponse) {
+        } else if (entity instanceof CreateUpdateSplitResponse) {
             transactionsEntityList = txnMapper.mapCreateUpdateSplit((CreateUpdateSplitResponse) entity);
         }
 

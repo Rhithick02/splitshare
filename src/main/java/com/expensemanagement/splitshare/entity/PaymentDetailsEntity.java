@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,11 +24,7 @@ public class PaymentDetailsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long paymentId;
-    private Long groupId;
     private Double amount;
-    private String status;
-    private Boolean deleted;
-    private String payerMethod;
     private String splitMethod;
 
     @OneToMany( mappedBy = "paymentDetail",
@@ -35,6 +32,17 @@ public class PaymentDetailsEntity {
                 fetch = FetchType.EAGER,
                 orphanRemoval = true)
     private Set<SplitInformationEntity> split;
+
+    @OneToMany( mappedBy = "paymentDetail",
+                cascade = CascadeType.ALL,
+                fetch = FetchType.EAGER,
+                orphanRemoval = true)
+    private Set<UserSplitPaymentsEntity> userSplitPayments;
+
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private GroupsEntity group;
+
     private Timestamp createDate;
     private Timestamp updateDate;
 
@@ -59,36 +67,12 @@ public class PaymentDetailsEntity {
         this.paymentId = paymentId;
     }
 
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
-    }
-
     public Double getAmount() {
         return amount;
     }
 
     public void setAmount(Double amount) {
         this.amount = amount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
     }
 
     public Timestamp getCreateDate() {
@@ -118,19 +102,27 @@ public class PaymentDetailsEntity {
         this.split = split;
     }
 
-    public String getPayerMethod() {
-        return payerMethod;
-    }
-
-    public void setPayerMethod(String payerMethod) {
-        this.payerMethod = payerMethod;
-    }
-
     public String getSplitMethod() {
         return splitMethod;
     }
 
     public void setSplitMethod(String splitMethod) {
         this.splitMethod = splitMethod;
+    }
+
+    public GroupsEntity getGroup() {
+        return group;
+    }
+
+    public void setGroup(GroupsEntity group) {
+        this.group = group;
+    }
+
+    public Set<UserSplitPaymentsEntity> getUserSplitPayments() {
+        return userSplitPayments;
+    }
+
+    public void setUserSplitPayments(Set<UserSplitPaymentsEntity> userSplitPayments) {
+        this.userSplitPayments = userSplitPayments;
     }
 }

@@ -19,10 +19,9 @@ public class PaymentsDao {
 
     public PaymentDetailsEntity savePaymentDetail(PaymentDetailsEntity paymentDetailsEntity) throws SQLException {
         try {
-            PaymentDetailsEntity response = paymentsRepository.save(paymentDetailsEntity);
-            return response;
+            return paymentsRepository.save(paymentDetailsEntity);
         } catch (Exception ex) {
-            log.error("Exception occurred while trying to save the paymentDetailsEntity for groupId = {}. Exception - {}", paymentDetailsEntity.getGroupId().toString(), ex.getMessage());
+            log.error("Exception occurred while trying to save the paymentDetailsEntity for groupId = {}. Exception - {}", paymentDetailsEntity.getGroup().getGroupId().toString(), ex.getMessage());
             throw new SQLException(ex.getMessage());
         }
     }

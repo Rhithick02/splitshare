@@ -12,7 +12,7 @@ import com.expensemanagement.splitshare.exception.BadRequestException;
 import com.expensemanagement.splitshare.exception.InternalServerException;
 import com.expensemanagement.splitshare.exception.NotFoundException;
 import com.expensemanagement.splitshare.integration.TwilioSmsIntegration;
-import com.expensemanagement.splitshare.model.GroupInformation;
+import com.expensemanagement.splitshare.model.GroupSummary;
 import com.expensemanagement.splitshare.util.JwtUtil;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -89,14 +89,14 @@ public class AuthService {
         loginResponse.setUserId(user.getUserId());
         loginResponse.setPhoneNumber(phoneNumber);
         loginResponse.setEmailId(user.getEmail());
-        List<GroupInformation> groupInformationList = new ArrayList<>();
+        List<GroupSummary> groupSummaryList = new ArrayList<>();
         for (GroupsEntity group: user.getGroups()) {
-            GroupInformation groupInformation = new GroupInformation();
-            groupInformation.setGroupId(group.getGroupId());
-            groupInformation.setGroupName(group.getGroupName());
-            groupInformationList.add(groupInformation);
+            GroupSummary groupSummary = new GroupSummary();
+            groupSummary.setGroupId(group.getGroupId());
+            groupSummary.setGroupName(group.getGroupName());
+            groupSummaryList.add(groupSummary);
         }
-        loginResponse.setGroupInformationList(groupInformationList);
+        loginResponse.setGroupSummaryList(groupSummaryList);
         return loginResponse;
     }
 

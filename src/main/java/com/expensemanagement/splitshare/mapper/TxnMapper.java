@@ -3,9 +3,11 @@ package com.expensemanagement.splitshare.mapper;
 import com.expensemanagement.splitshare.dto.AddUserResponse;
 import com.expensemanagement.splitshare.dto.CreateGroupResponse;
 import com.expensemanagement.splitshare.dto.CreateUpdateSplitResponse;
+import com.expensemanagement.splitshare.dto.GroupDetailsResponse;
 import com.expensemanagement.splitshare.dto.LoginResponse;
 import com.expensemanagement.splitshare.entity.TransactionsEntity;
 import com.expensemanagement.splitshare.enums.TransactionTypeEnum;
+import com.expensemanagement.splitshare.model.GroupInformation;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -49,11 +51,11 @@ public class TxnMapper {
         List<TransactionsEntity> transactionsEntityList = new ArrayList<>();
         TransactionsEntity transactionsEntity = new TransactionsEntity();
         transactionsEntity.setGroupId(createUpdateSplitResponse.getGroupId());
-        String transactionType = createUpdateSplitResponse.isUpdate() ? TransactionTypeEnum.UPDATE_SPLIT.toString() : TransactionTypeEnum.CREATE_SPLIT.toString();
-        transactionsEntity.setTransactionType(transactionType);
-        transactionsEntity.setPaymentId(createUpdateSplitResponse.getPaymentId());
-        transactionsEntity.setTotalAmount(createUpdateSplitResponse.getTotalAmount());
         transactionsEntity.setUserId(createUpdateSplitResponse.getUserId());
+        transactionsEntity.setPaymentId(createUpdateSplitResponse.getPaymentId());
+        String transactionType = createUpdateSplitResponse.isUpdatePayment() ? TransactionTypeEnum.UPDATE_SPLIT.toString() : TransactionTypeEnum.CREATE_SPLIT.toString();
+        transactionsEntity.setTransactionType(transactionType);
+        transactionsEntity.setTotalAmount(createUpdateSplitResponse.getPaymentAmount());
         transactionsEntityList.add(transactionsEntity);
         return transactionsEntityList;
     }

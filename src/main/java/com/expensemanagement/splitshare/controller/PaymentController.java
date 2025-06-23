@@ -44,12 +44,4 @@ public class PaymentController {
         transactionsDao.populateTransactionHistory(createUpdateSplitResponse);
         return new ResponseEntity<>(createUpdateSplitResponse, HttpStatus.OK);
     }
-
-//    @GetMapping("/get-group-txn/{groupId}")
-//    @Transactional
-//    public ResponseEntity<?> getGroupTransactions(@PathVariable Long groupId, @RequestHeader Map<String, String> requestHeaders) {
-////        CreateUpdateSplitResponse createGroupResponse = paymentService.createOrUpdateSplit(createUpdateSplitRequest);
-////        transactionsDao.populateTransactionHistory(createGroupResponse);
-//        return new ResponseEntity<>(createGroupResponse, HttpStatus.OK);
-//    }
 }

@@ -9,6 +9,7 @@ import com.expensemanagement.splitshare.entity.SplitInformationEntity;
 import com.expensemanagement.splitshare.entity.UserSplitDetailsEntity;
 import com.expensemanagement.splitshare.entity.UserSplitPaymentsEntity;
 import com.expensemanagement.splitshare.enums.PaymentPartyEnum;
+import com.expensemanagement.splitshare.enums.PaymentStatusEnum;
 import com.expensemanagement.splitshare.exception.InternalServerException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -49,6 +50,10 @@ public class PaymentService {
         try {
             // Step 1: Get groupEntity from database
             GroupsEntity group = groupsDao.getGroupByGroupId(createUpdateSplitRequest.getGroupId());
+            List<Long> existingPaymentIds = group.getPayments()
+                    .stream()
+                    .map(PaymentDetailsEntity::getPaymentId)
+                    .toList();
 
             // Step 2: Build PaymentDetailsEntity, UserSplitPaymentsEntity, SplitInformationEntity for add and update operation
             PaymentDetailsEntity paymentDetailsEntity = null;
@@ -84,7 +89,6 @@ public class PaymentService {
             } else {
                 paymentDetailsEntity = new PaymentDetailsEntity();
             }
-            paymentDetailsEntity.setNew(true);
             paymentDetailsEntity.setAmount(createUpdateSplitRequest.getTotalAmount());
             paymentDetailsEntity.setSplitMethod(createUpdateSplitRequest.getSplitMethod());
 
@@ -167,6 +171,7 @@ public class PaymentService {
                         userSplitDetailEntity.setToUserId(debtorMoneyTrack.getLeft());
                         userSplitDetailEntity.setAmountOwed(debtorMoneyTrack.getRight());
                         userSplitDetailEntity.setAmountPaid(0.0);
+                        userSplitDetailEntity.setPaymentStatus(PaymentStatusEnum.UNSETTLED.name());
                         userSplitDetailEntity.setGroup(group);
                         userSplitDetailsEntitySet.add(userSplitDetailEntity);
                     }
@@ -175,7 +180,14 @@ public class PaymentService {
             group.setUserSplitDetails(userSplitDetailsEntitySet);
             // Step 6: Upsert group entity to database
             GroupsEntity groupSavedToDb = groupsDao.saveToDb(group);
-            return buildCreateSplitResponse(groupSavedToDb);
+            Long latestPaymentId = Objects.nonNull(createUpdateSplitRequest.getPaymentId())
+                                                                ? createUpdateSplitRequest.getPaymentId() : groupSavedToDb.getPayments()
+                                                                                .stream()
+                                                                                .map(PaymentDetailsEntity::getPaymentId)
+                                                                                .filter(paymentId -> !existingPaymentIds.contains(paymentId))
+                                                                                .findFirst()
+                                                                                .get();
+            return buildCreateSplitResponse(groupSavedToDb, latestPaymentId);
         } catch (SQLException ex) {
             throw new InternalServerException(ex.getMessage());
         }
@@ -227,16 +239,6 @@ public class PaymentService {
         }
     }
 
-    private Map<Long, List<Pair<Long, Double>>> reverseDebtorUserPaymentsTrack(Map<Long, List<Pair<Long, Double>>> prunedDebtorUserPaymentsTrack) {
-        Map<Long, List<Pair<Long, Double>>> reverseGraph = new HashMap<>();
-        for (Map.Entry<Long, List<Pair<Long, Double>>> debtorPaymentTrack : prunedDebtorUserPaymentsTrack.entrySet()) {
-            for (Pair<Long, Double> debtorPayment : debtorPaymentTrack.getValue()) {
-                addUserPaymentsToMap(reverseGraph, debtorPayment.getLeft(), debtorPaymentTrack.getKey(), debtorPayment.getRight());
-            }
-        }
-        return reverseGraph;
-    }
-
     private Set<UserSplitPaymentsEntity> buildUserSplitPaymentsEntity(Map<Long, List<Pair<Long, Double>>> userPaymentsTrack, PaymentDetailsEntity paymentDetailsEntity, Long version) {
         Set<UserSplitPaymentsEntity> userSplitPaymentsEntitySet = new HashSet<>();
         for (Map.Entry<Long, List<Pair<Long, Double>>> userPaymentTrack : userPaymentsTrack.entrySet()) {
@@ -254,11 +256,11 @@ public class PaymentService {
         return userSplitPaymentsEntitySet;
     }
 
-    private CreateUpdateSplitResponse buildCreateSplitResponse(GroupsEntity group) {
+    private CreateUpdateSplitResponse buildCreateSplitResponse(GroupsEntity group, Long latestPaymentId) {
         CreateUpdateSplitResponse createUpdateSplitResponse = new CreateUpdateSplitResponse();
         createUpdateSplitResponse.setGroupId(group.getGroupId());
         createUpdateSplitResponse.setGroupName(group.getGroupName());
-        Optional<PaymentDetailsEntity> optionalPaymentDetail = group.getPayments().stream().filter(PaymentDetailsEntity::isNew).findFirst();
+        Optional<PaymentDetailsEntity> optionalPaymentDetail = group.getPayments().stream().filter(paymentDetailsEntity -> paymentDetailsEntity.getPaymentId().equals(latestPaymentId)).findFirst();
         if (optionalPaymentDetail.isPresent()) {
             PaymentDetailsEntity paymentDetail = optionalPaymentDetail.get();
             Set<UserSplitPaymentsEntity> userSplitPaymentsEntitySet = paymentDetail.getUserSplitPayments();
@@ -269,7 +271,6 @@ public class PaymentService {
             createUpdateSplitResponse.setUserPaymentTrack(userPaymentsTrack);
             createUpdateSplitResponse.setPaymentId(paymentDetail.getPaymentId());
             createUpdateSplitResponse.setUpdatePayment(false);
-            paymentDetail.setNew(false);
         }
         return createUpdateSplitResponse;
     }

@@ -46,9 +46,6 @@ public class PaymentDetailsEntity {
     private Timestamp createDate;
     private Timestamp updateDate;
 
-    @Transient
-    private boolean isNew;
-
     @PrePersist
     public void setCreationAndUpdationDate() {
         Timestamp timestamp = new Timestamp(new Date().getTime());
@@ -127,13 +124,5 @@ public class PaymentDetailsEntity {
 
     public void setUserSplitPayments(Set<UserSplitPaymentsEntity> userSplitPayments) {
         this.userSplitPayments = userSplitPayments;
-    }
-
-    public boolean isNew() {
-        return isNew;
-    }
-
-    public void setNew(boolean aNew) {
-        isNew = aNew;
     }
 }
